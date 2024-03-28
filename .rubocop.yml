@@ -892,3 +892,12 @@ Style/ZeroLengthPredicate:
 
 RSpec/FilePath:
   SpecSuffixOnly: true
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
