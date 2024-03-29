@@ -10,7 +10,7 @@ module LaunchDarkly
       #
       # The default is nil.
       #
-      # @return [OpenTelemetry::Trace::Tracer]
+      # @return [OpenTelemetry::Trace::Tracer, nil]
       #
       attr_reader :tracer
 

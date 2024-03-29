@@ -10,7 +10,6 @@ module LaunchDarkly
   #
   module Otel
     #
-    # The default value for {#logger}.
     # @return [Logger] the Rails logger if in Rails, or a default Logger at WARN level otherwise
     #
     def self.default_logger

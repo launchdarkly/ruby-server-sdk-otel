@@ -13,3 +13,6 @@ gem "rubocop", "~> 1.21"
 gem "rubocop-performance", "~> 1.15"
 gem "rubocop-rake", "~> 0.6"
 gem "rubocop-rspec", "~> 2.27"
+
+# TODO: Take this out
+gem 'launchdarkly-server-sdk', :git => 'https://github.com/launchdarkly/ruby-server-sdk', :branch => 'feat/hooks'
