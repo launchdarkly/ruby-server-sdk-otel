@@ -1,8 +1,9 @@
 /.bundle/
-/.yardoc
-/_yardoc/
+.yardoc
+_yardoc/
+doc/
 /coverage/
-/doc/
+/docs/build
 /pkg/
 /spec/reports/
 /tmp/
@@ -11,3 +12,4 @@
 .rspec_status
 
 Gemfile.lock
+*.gem

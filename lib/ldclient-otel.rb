@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'ldclient-otel/tracing_hook'
 require_relative 'ldclient-otel/version'
 require 'logger'
 
