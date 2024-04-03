@@ -5,14 +5,14 @@ module LaunchDarkly
   module Otel
     class TracingHookOptions
       #
-      # If provided a tracer, then the tracing hook will add spans for each variation method call. Span events are
-      # always added and are unaffected by this setting.
+      # If set to true, then the tracing hook will add spans for each variation method call. Span events are always
+      # added and are unaffected by this setting.
       #
-      # The default is nil.
+      # The default value is false.
       #
-      # @return [OpenTelemetry::Trace::Tracer, nil]
+      # @return [Boolean, nil]
       #
-      attr_reader :tracer
+      attr_reader :add_spans
 
       #
       # If set to true, then the tracing hook will add the evaluated flag value to span events.
@@ -34,12 +34,12 @@ module LaunchDarkly
       # Configuration options to control the effect of the TracingHook.
       #
       # @param opts [Hash] the configuration options
-      # @option opts [OpenTelemetry::Trace::Tracer, nil] :tracer See {#tracer}.
+      # @option opts [Boolean, nil] :add_spans See {#add_spans}.
       # @option opts [Boolean] :include_variant See {#include_variant}.
       # @option opts [Logger] :logger See {#logger}.
       #
       def initialize(opts = {})
-        @tracer = opts.fetch(:tracer, nil)
+        @add_spans = opts.fetch(:add_spans, nil)
         @include_variant = opts.fetch(:include_variant, false)
         @logger = opts[:logger] || LaunchDarkly::Otel.default_logger
       end
@@ -53,6 +53,7 @@ module LaunchDarkly
       #
       def initialize(config = TracingHookOptions.new())
         @config = config
+        @tracer = OpenTelemetry.tracer_provider.tracer('launchdarkly')
       end
 
       #
@@ -75,13 +76,13 @@ module LaunchDarkly
       # @return [Hash] Data to use when executing the next state of the hook in the evaluation series.
       #
       def before_evaluation(evaluation_series_context, data)
-        return data if @config.tracer.nil?
+        return data unless @config.add_spans
 
         attributes = {
           'feature_flag.context.key' => evaluation_series_context.context.fully_qualified_key,
           'feature_flag.key' => evaluation_series_context.key,
         }
-        span = @config.tracer.start_span(evaluation_series_context.method, attributes: attributes)
+        span = @tracer.start_span(evaluation_series_context.method, attributes: attributes)
         ctx = OpenTelemetry::Trace.context_with_span(span)
         token = OpenTelemetry::Context.attach(ctx)
 

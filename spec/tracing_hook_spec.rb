@@ -7,6 +7,7 @@ require 'ldclient-otel/tracing_hook'
 RSpec.describe LaunchDarkly::Otel do
   let(:td) { LaunchDarkly::Integrations::TestData.data_source() }
   let(:exporter) { OpenTelemetry::SDK::Trace::Export::InMemorySpanExporter.new }
+  let(:tracer) { OpenTelemetry.tracer_provider.tracer('rspec', '0.1.0') }
 
   before do
     OpenTelemetry::SDK.configure do |c|
@@ -20,7 +21,6 @@ RSpec.describe LaunchDarkly::Otel do
     let(:client) { LaunchDarkly::LDClient.new('key', config) }
 
     it 'records nothing if not within a span' do
-      tracer = OpenTelemetry.tracer_provider.tracer('my_app_or_library', '0.1.0')
       result = client.variation('boolean', {key: 'org-key', kind: 'org'}, true)
 
       spans = exporter.finished_spans
@@ -28,7 +28,6 @@ RSpec.describe LaunchDarkly::Otel do
     end
 
     it 'records basic span event' do
-      tracer = OpenTelemetry.tracer_provider.tracer('my_app_or_library', '0.1.0')
       tracer.in_span('toplevel') do |span|
         result = client.variation('boolean', {key: 'org-key', kind: 'org'}, true)
       end
@@ -57,7 +56,6 @@ RSpec.describe LaunchDarkly::Otel do
       flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('boolean').boolean_flag
       td.update(flag)
 
-      tracer = OpenTelemetry.tracer_provider.tracer('my_app_or_library', '0.1.0')
       tracer.in_span('toplevel') do |span|
         result = client.variation('boolean', {key: 'org-key', kind: 'org'}, false)
       end
@@ -72,15 +70,13 @@ RSpec.describe LaunchDarkly::Otel do
     end
   end
 
-  context 'with tracer' do
-    let(:tracer) { OpenTelemetry.tracer_provider.tracer('my_app_or_library', '0.1.0') }
-    let(:options) { LaunchDarkly::Otel::TracingHookOptions.new({tracer: tracer}) }
+  context 'with add_spans' do
+    let(:options) { LaunchDarkly::Otel::TracingHookOptions.new({add_spans: true}) }
     let(:hook) { LaunchDarkly::Otel::TracingHook.new(options) }
     let(:config) { LaunchDarkly::Config.new({data_source: td, hooks: [hook]}) }
     let(:client) { LaunchDarkly::LDClient.new('key', config) }
 
     it 'creates a span if one is not active' do
-      tracer = OpenTelemetry.tracer_provider.tracer('my_app_or_library', '0.1.0')
       result = client.variation('boolean', {key: 'org-key', kind: 'org'}, false)
 
       spans = exporter.finished_spans
