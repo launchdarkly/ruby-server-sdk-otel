@@ -5,10 +5,12 @@ module LaunchDarkly
   module Otel
     class TracingHookOptions
       #
-      # If set to true, then the tracing hook will add spans for each variation method call. Span events are always
-      # added and are unaffected by this setting.
+      # Experimental: If set to true, then the tracing hook will add spans for each variation method call. Span events
+      # are always added and are unaffected by this setting.
       #
       # The default value is false.
+      #
+      # This feature is experimental and the data in the spans, or nesting of spans, could change in future versions.
       #
       # @return [Boolean, nil]
       #
