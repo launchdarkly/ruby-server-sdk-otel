@@ -32,7 +32,7 @@ Below is a sample of expected output.
 
 ```
 Verified signature against tlog entry index 78214752 at URL: https://rekor.sigstore.dev/api/v1/log/entries/24296fb24b8ad77ab941c118ef7e0b2d656b962a0d670c6ac91cfa37d07b7b121ae560b00a978ecf
-Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.7.0" at commit f43b3ad834103fdc282652efbfe4963e8dfa737b
+Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.10.0" at commit f43b3ad834103fdc282652efbfe4963e8dfa737b
 Verifying artifact launchdarkly-server-sdk-otel-0.0.0.gem: PASSED
 
 PASSED: Verified SLSA provenance
