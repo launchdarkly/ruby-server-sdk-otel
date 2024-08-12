@@ -53,7 +53,7 @@ jobs:
 
   release-provenance:
     needs: [ 'release-package' ]
-    if: ${{ needs.release-package.outputs.release-created }}
+    if: ${{ needs.release-package.outputs.release-created == 'true' }}
     permissions:
       actions: read
       id-token: write
