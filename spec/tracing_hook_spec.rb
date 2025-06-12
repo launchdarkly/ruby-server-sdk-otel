@@ -42,7 +42,7 @@ RSpec.describe LaunchDarkly::Otel do
       expect(event.attributes['feature_flag.key']).to eq 'boolean'
       expect(event.attributes['feature_flag.provider_name']).to eq 'LaunchDarkly'
       expect(event.attributes['feature_flag.context.key']).to eq 'org:org-key'
-      expect(event.attributes['feature_flag.variant']).to eq nil
+      expect(event.attributes['feature_flag.variant']).to be_nil
     end
   end
 
@@ -109,7 +109,7 @@ RSpec.describe LaunchDarkly::Otel do
       expect(event.attributes['feature_flag.key']).to eq 'boolean'
       expect(event.attributes['feature_flag.provider_name']).to eq 'LaunchDarkly'
       expect(event.attributes['feature_flag.context.key']).to eq 'org:org-key'
-      expect(event.attributes['feature_flag.variant']).to eq nil
+      expect(event.attributes['feature_flag.variant']).to be_nil
     end
 
     it 'hook makes its span active' do
@@ -140,13 +140,13 @@ RSpec.describe LaunchDarkly::Otel do
       expect(middle.events[0].attributes['feature_flag.key']).to eq 'boolean'
       expect(middle.events[0].attributes['feature_flag.provider_name']).to eq 'LaunchDarkly'
       expect(middle.events[0].attributes['feature_flag.context.key']).to eq 'org:org-key'
-      expect(middle.events[0].attributes['feature_flag.variant']).to eq nil
+      expect(middle.events[0].attributes['feature_flag.variant']).to be_nil
 
       expect(top.events[0].name).to eq 'feature_flag'
       expect(top.events[0].attributes['feature_flag.key']).to eq 'boolean'
       expect(top.events[0].attributes['feature_flag.provider_name']).to eq 'LaunchDarkly'
       expect(top.events[0].attributes['feature_flag.context.key']).to eq 'org:org-key'
-      expect(top.events[0].attributes['feature_flag.variant']).to eq nil
+      expect(top.events[0].attributes['feature_flag.variant']).to be_nil
     end
   end
 end
