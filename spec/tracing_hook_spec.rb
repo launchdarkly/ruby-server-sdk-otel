@@ -200,43 +200,43 @@ RSpec.describe LaunchDarkly::Otel do
     end
   end
 
-  context 'with inExperiment and variationIndex' do
-    let(:hook) { LaunchDarkly::Otel::TracingHook.new }
-    let(:config) { LaunchDarkly::Config.new({data_source: td, hooks: [hook]}) }
-    let(:client) { LaunchDarkly::LDClient.new('key', config) }
-
-    it 'includes inExperiment when evaluation is part of experiment' do
-      flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('experiment-flag')
-        .variations(false, true)
-        .fallthrough_variation(1)
-        .on(true)
-      td.update(flag)
-
-      tracer.in_span('toplevel') do |span|
-        result = client.variation('experiment-flag', {key: 'user-key', kind: 'user'}, false)
+    context 'with inExperiment and variationIndex' do
+      let(:hook) { LaunchDarkly::Otel::TracingHook.new }
+      let(:config) { LaunchDarkly::Config.new({data_source: td, hooks: [hook]}) }
+      let(:client) { LaunchDarkly::LDClient.new('key', config) }
+  
+      it 'includes inExperiment when evaluation is part of experiment' do
+        flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('experiment-flag')
+          .variations(false, true)
+          .fallthrough_variation(1)
+          .on(true)
+        td.update(flag)
+  
+        tracer.in_span('toplevel') do |span|
+          result = client.variation('experiment-flag', {key: 'user-key', kind: 'user'}, false)
+        end
+  
+        spans = exporter.finished_spans
+        event = spans[0].events[0]
+        expect(event.attributes.key?('feature_flag.result.reason.inExperiment')).to be false
       end
-
-      spans = exporter.finished_spans
-      event = spans[0].events[0]
-      expect(event.attributes.key?('feature_flag.result.reason.inExperiment')).to be false
-    end
-
-    it 'includes variationIndex when available' do
-      flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('indexed-flag')
-        .variations('value-0', 'value-1', 'value-2')
-        .fallthrough_variation(1)
-        .on(true)
-      td.update(flag)
-
-      tracer.in_span('toplevel') do |span|
-        result = client.variation('indexed-flag', {key: 'user-key', kind: 'user'}, 'default')
+  
+      it 'includes variationIndex when available' do
+        flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('indexed-flag')
+          .variations('value-0', 'value-1', 'value-2')
+          .fallthrough_variation(1)
+          .on(true)
+        td.update(flag)
+  
+        tracer.in_span('toplevel') do |span|
+          result = client.variation('indexed-flag', {key: 'user-key', kind: 'user'}, 'default')
+        end
+  
+        spans = exporter.finished_spans
+        event = spans[0].events[0]
+        expect(event.attributes['feature_flag.result.variationIndex']).to eq 1
       end
-
-      spans = exporter.finished_spans
-      event = spans[0].events[0]
-      expect(event.attributes['feature_flag.result.variationIndex']).to eq 1
     end
-  end
 
   end
 end
