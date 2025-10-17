@@ -60,8 +60,8 @@ module LaunchDarkly
         @add_spans = opts.fetch(:add_spans, nil)
         @include_value = opts.fetch(:include_value, opts.fetch(:include_variant, false))
         @include_variant = opts.fetch(:include_variant, false)
-        @environment_id = validate_environment_id(opts[:environment_id])
         @logger = opts[:logger] || LaunchDarkly::Otel.default_logger
+        @environment_id = validate_environment_id(opts[:environment_id])
       end
 
       private
