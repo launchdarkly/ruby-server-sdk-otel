@@ -64,17 +64,12 @@ module LaunchDarkly
         @environment_id = validate_environment_id(opts[:environment_id])
       end
 
-      private
-
-      def validate_environment_id(env_id)
+      private def validate_environment_id(env_id)
         return nil if env_id.nil?
+        return env_id if env_id.is_a?(String) && !env_id.empty?
 
-        if env_id.is_a?(String) && !env_id.empty?
-          env_id
-        else
-          @logger.warn("LaunchDarkly Tracing Hook: Invalid environment_id provided. It must be a non-empty string.")
-          nil
-        end
+        @logger.warn("LaunchDarkly Tracing Hook: Invalid environment_id provided. It must be a non-empty string.")
+        nil
       end
     end
 
