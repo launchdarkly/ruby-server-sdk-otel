@@ -23,7 +23,21 @@ module LaunchDarkly
       #
       # @return [Boolean]
       #
+      attr_reader :include_value
+
+      #
+      # Deprecated: Use include_value instead.
+      #
+      # @return [Boolean]
+      #
       attr_reader :include_variant
+
+      #
+      # Optional environment ID to include as feature_flag.set.id attribute.
+      #
+      # @return [String, nil]
+      #
+      attr_reader :environment_id
 
       #
       # The logger used for hook execution. Provide a custom logger or use the default which logs to the console.
@@ -37,13 +51,30 @@ module LaunchDarkly
       #
       # @param opts [Hash] the configuration options
       # @option opts [Boolean, nil] :add_spans See {#add_spans}.
-      # @option opts [Boolean] :include_variant See {#include_variant}.
+      # @option opts [Boolean] :include_value See {#include_value}.
+      # @option opts [Boolean] :include_variant (Deprecated) See {#include_variant}.
+      # @option opts [String, nil] :environment_id See {#environment_id}.
       # @option opts [Logger] :logger See {#logger}.
       #
       def initialize(opts = {})
         @add_spans = opts.fetch(:add_spans, nil)
+        @include_value = opts.fetch(:include_value, opts.fetch(:include_variant, false))
         @include_variant = opts.fetch(:include_variant, false)
+        @environment_id = validate_environment_id(opts[:environment_id])
         @logger = opts[:logger] || LaunchDarkly::Otel.default_logger
+      end
+
+      private
+
+      def validate_environment_id(env_id)
+        return nil if env_id.nil?
+
+        if env_id.is_a?(String) && !env_id.empty?
+          env_id
+        else
+          @logger.warn("LaunchDarkly Tracing Hook: Invalid environment_id provided. It must be a non-empty string.")
+          nil
+        end
       end
     end
 
@@ -81,7 +112,7 @@ module LaunchDarkly
         return data unless @config.add_spans
 
         attributes = {
-          'feature_flag.context.key' => evaluation_series_context.context.fully_qualified_key,
+          'feature_flag.context.id' => evaluation_series_context.context.fully_qualified_key,
           'feature_flag.key' => evaluation_series_context.key,
         }
         span = @tracer.start_span(evaluation_series_context.method, attributes: attributes)
@@ -114,10 +145,17 @@ module LaunchDarkly
 
         event = {
           'feature_flag.key' => evaluation_series_context.key,
-          'feature_flag.provider_name' => 'LaunchDarkly',
-          'feature_flag.context.key' => evaluation_series_context.context.fully_qualified_key,
+          'feature_flag.provider.name' => 'LaunchDarkly',
+          'feature_flag.context.id' => evaluation_series_context.context.fully_qualified_key,
         }
-        event['feature_flag.variant'] = detail.value.to_s if @config.include_variant
+
+        event['feature_flag.result.value'] = detail.value.to_s if @config.include_value || @config.include_variant
+
+        event['feature_flag.result.reason.inExperiment'] = true if detail.reason&.in_experiment
+
+        event['feature_flag.result.variationIndex'] = detail.variation_index if detail.variation_index
+
+        event['feature_flag.set.id'] = @config.environment_id if @config.environment_id
 
         span.add_event('feature_flag', attributes: event)
 
