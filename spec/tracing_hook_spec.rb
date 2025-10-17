@@ -168,70 +168,70 @@ RSpec.describe LaunchDarkly::Otel do
       expect(top.events[0].attributes['feature_flag.result.value']).to be_nil
     end
 
-  context 'with environment_id' do
-    let(:options) { LaunchDarkly::Otel::TracingHookOptions.new({environment_id: 'test-env-123'}) }
-    let(:hook) { LaunchDarkly::Otel::TracingHook.new(options) }
-    let(:config) { LaunchDarkly::Config.new({data_source: td, hooks: [hook]}) }
-    let(:client) { LaunchDarkly::LDClient.new('key', config) }
+    context 'with environment_id' do
+      let(:options) { LaunchDarkly::Otel::TracingHookOptions.new({environment_id: 'test-env-123'}) }
+      let(:hook) { LaunchDarkly::Otel::TracingHook.new(options) }
+      let(:config) { LaunchDarkly::Config.new({data_source: td, hooks: [hook]}) }
+      let(:client) { LaunchDarkly::LDClient.new('key', config) }
 
-    it 'includes environment_id in event' do
-      tracer.in_span('toplevel') do |span|
-        result = client.variation('boolean', {key: 'org-key', kind: 'org'}, true)
+      it 'includes environment_id in event' do
+        tracer.in_span('toplevel') do |span|
+          result = client.variation('boolean', {key: 'org-key', kind: 'org'}, true)
+        end
+
+        spans = exporter.finished_spans
+        event = spans[0].events[0]
+        expect(event.attributes['feature_flag.set.id']).to eq 'test-env-123'
       end
 
-      spans = exporter.finished_spans
-      event = spans[0].events[0]
-      expect(event.attributes['feature_flag.set.id']).to eq 'test-env-123'
-    end
+      it 'does not include environment_id when invalid' do
+        invalid_options = LaunchDarkly::Otel::TracingHookOptions.new({environment_id: ''})
+        invalid_hook = LaunchDarkly::Otel::TracingHook.new(invalid_options)
+        invalid_config = LaunchDarkly::Config.new({data_source: td, hooks: [invalid_hook]})
+        invalid_client = LaunchDarkly::LDClient.new('key', invalid_config)
 
-    it 'does not include environment_id when invalid' do
-      invalid_options = LaunchDarkly::Otel::TracingHookOptions.new({environment_id: ''})
-      invalid_hook = LaunchDarkly::Otel::TracingHook.new(invalid_options)
-      invalid_config = LaunchDarkly::Config.new({data_source: td, hooks: [invalid_hook]})
-      invalid_client = LaunchDarkly::LDClient.new('key', invalid_config)
+        tracer.in_span('toplevel') do |span|
+          result = invalid_client.variation('boolean', {key: 'org-key', kind: 'org'}, true)
+        end
 
-      tracer.in_span('toplevel') do |span|
-        result = invalid_client.variation('boolean', {key: 'org-key', kind: 'org'}, true)
+        spans = exporter.finished_spans
+        event = spans[0].events[0]
+        expect(event.attributes['feature_flag.set.id']).to be_nil
       end
-
-      spans = exporter.finished_spans
-      event = spans[0].events[0]
-      expect(event.attributes['feature_flag.set.id']).to be_nil
     end
-  end
 
     context 'with inExperiment and variationIndex' do
       let(:hook) { LaunchDarkly::Otel::TracingHook.new }
       let(:config) { LaunchDarkly::Config.new({data_source: td, hooks: [hook]}) }
       let(:client) { LaunchDarkly::LDClient.new('key', config) }
-  
+
       it 'includes inExperiment when evaluation is part of experiment' do
         flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('experiment-flag')
           .variations(false, true)
           .fallthrough_variation(1)
           .on(true)
         td.update(flag)
-  
+
         tracer.in_span('toplevel') do |span|
           result = client.variation('experiment-flag', {key: 'user-key', kind: 'user'}, false)
         end
-  
+
         spans = exporter.finished_spans
         event = spans[0].events[0]
         expect(event.attributes.key?('feature_flag.result.reason.inExperiment')).to be false
       end
-  
+
       it 'includes variationIndex when available' do
         flag = LaunchDarkly::Integrations::TestData::FlagBuilder.new('indexed-flag')
           .variations('value-0', 'value-1', 'value-2')
           .fallthrough_variation(1)
           .on(true)
         td.update(flag)
-  
+
         tracer.in_span('toplevel') do |span|
           result = client.variation('indexed-flag', {key: 'user-key', kind: 'user'}, 'default')
         end
-  
+
         spans = exporter.finished_spans
         event = spans[0].events[0]
         expect(event.attributes['feature_flag.result.variationIndex']).to eq 1
