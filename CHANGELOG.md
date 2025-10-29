@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/launchdarkly/ruby-server-sdk-otel/compare/1.1.0...1.1.1) (2025-10-29)
+
+
+### Bug Fixes
+
+* Loosen overly restrict opentelemetry-sdk versioning to allow v1 ([#15](https://github.com/launchdarkly/ruby-server-sdk-otel/issues/15)) ([064958d](https://github.com/launchdarkly/ruby-server-sdk-otel/commit/064958dabca3c8fd79da5914bde8f557fd561535)), closes [#14](https://github.com/launchdarkly/ruby-server-sdk-otel/issues/14)
+
 ## [1.1.0](https://github.com/launchdarkly/ruby-server-sdk-otel/compare/1.0.0...1.1.0) (2025-10-17)
 
 
