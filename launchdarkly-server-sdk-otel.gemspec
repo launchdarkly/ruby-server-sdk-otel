@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "launchdarkly-server-sdk", "~> 8.4.0"
-  spec.add_runtime_dependency "opentelemetry-sdk", "~> 1.4.0"
+  spec.add_runtime_dependency "opentelemetry-sdk", "~> 1.0", ">= 1.4.0"
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
