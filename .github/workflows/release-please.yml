@@ -16,7 +16,6 @@ jobs:
     outputs:
       release-created: ${{ steps.release.outputs.release_created }}
       upload-tag-name: ${{ steps.release.outputs.tag_name }}
-      gem-hash: ${{ steps.publish.outputs.gem-hash}}
     steps:
       - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
         id: release
@@ -52,15 +51,8 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Generate checksums file
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
-        env:
-          HASHES: ${{ steps.publish.outputs.gem-hash }}
-        run: |
-          echo "$HASHES" | base64 -d > checksums.txt
-
       - name: Attest build provenance
         if: ${{ steps.release.outputs.releases_created == 'true' }}
         uses: actions/attest@v4
         with:
-          subject-checksums: checksums.txt
+          subject-path: 'launchdarkly-server-sdk-otel-*.gem'
