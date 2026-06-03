@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "launchdarkly-server-sdk", "~> 8.4.0"
+  spec.add_runtime_dependency "launchdarkly-server-sdk", "~> 8.4"
   spec.add_runtime_dependency "opentelemetry-sdk", "~> 1.0", ">= 1.4.0"
 
   spec.add_development_dependency 'rake', '~> 13.0'
