@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/launchdarkly/ruby-server-sdk-otel/compare/1.1.1...1.1.2) (2026-06-04)
+
+
+### Bug Fixes
+
+* Loosen launchdarkly-server-sdk constraint to ~&gt; 8.4 ([#25](https://github.com/launchdarkly/ruby-server-sdk-otel/issues/25)) ([160c165](https://github.com/launchdarkly/ruby-server-sdk-otel/commit/160c165d928b87ada6fcc53614953ede6054884f))
+
 ## [1.1.1](https://github.com/launchdarkly/ruby-server-sdk-otel/compare/1.1.0...1.1.1) (2025-10-29)
 
 
