@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/launchdarkly/ruby-server-sdk-otel/compare/1.1.2...1.1.3) (2026-11-20)
+
+
+### Bug Fixes
+
+* Bump minimum to ruby 3.1 ([#31](https://github.com/launchdarkly/ruby-server-sdk-otel/issues/31)) ([d616911](https://github.com/launchdarkly/ruby-server-sdk-otel/commit/d616911908984828e24cd972776ff84224102c70))
+
 ## [1.1.2](https://github.com/launchdarkly/ruby-server-sdk-otel/compare/1.1.1...1.1.2) (2026-06-04)
 
 
