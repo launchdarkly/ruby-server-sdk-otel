@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "LaunchDarkly SDK OTEL integration"
   spec.description = "LaunchDarkly SDK OTEL integration for the Ruby server side SDK"
   spec.homepage = "https://github.com/launchdarkly/ruby-server-sdk-otel"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/launchdarkly/ruby-server-sdk-otel"
